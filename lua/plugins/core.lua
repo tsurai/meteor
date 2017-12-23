@@ -28,18 +28,11 @@ function Core.listen(from, to, input)
     end
 
     return string.sub(out, 1, string.len(out)-2)
-
-  --[[else
-    match = string.match(input, "show commands for (.*)")
-    if match ~= nil then
-    if
-    return true
-  ]]--
-  elseif string.match(input:lower(), "reload plugins") ~= nil then
-    Manager.unload_plugins()
-    if Manager.initialize() ~= nil then
-      return "Plugins have been reloaded"
-    end
+  --elseif string.match(input:lower(), "reload plugins") ~= nil then
+  --  Manager.unload_plugins()
+  --  if Manager.initialize() ~= nil then
+  --    return "Plugins have been reloaded"
+  --  end
   elseif string.match(input:lower(), "who are you%??") ~= nil then
     return "I'm a meteor bot v0.1 powered by Rust and Lua"
   end
