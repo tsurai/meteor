@@ -1,0 +1,17 @@
+[package]
+name = "meteor"
+version = "0.1.0"
+authors = ["Cristian Kubis <cristian.kubis@tsunix.de>"]
+
+[dependencies]
+error-chain = "^0.11.0"
+log = "^0.3.8"
+chrono = "^0.4.0"
+fern = "^0.4.3"
+clap = "^2.27.1"
+regex = "^0.2.3"
+irc = "^0.12.5"
+
+[dependencies.rlua]
+version = "*"
+default-features = false
