@@ -66,7 +66,7 @@ fn init_logger(logfile: &str, verbosity: u64) -> Result<()> {
 }
 
 fn start_bot() -> Result<()> {
-    let server = IrcServer::new("/home/tsurai/.local/meteor/config.toml")
+    let server = IrcServer::new("/etc/meteor/config.toml")
         .chain_err(|| "failed to create IRC server object")?;
 
     let bot_nick = server.current_nickname().clone();
@@ -109,7 +109,7 @@ fn run() -> Result<()> {
     let matches = process_cli();
     let verbosity = matches.occurrences_of("verbose");
 
-    init_logger("/home/tsurai/.local/meteor/meteor.log", verbosity)
+    init_logger("/var/log/meteor/meteor.log", verbosity)
         .chain_err(|| "failed to setup logging system")?;
 
    start_bot()
