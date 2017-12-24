@@ -49,7 +49,7 @@ function Manager.load_plugins()
             info("loading plugin " .. filename)
 
             filepath = path.."/"..filename
-            plugin, err = loadfile(filepath)
+            plugin, e = loadfile(filepath)
 
             if plugin ~= nil then
                 plugin = plugin()
@@ -58,7 +58,7 @@ function Manager.load_plugins()
                     Manager.plugin_list[plugin.name()] = plugin
                 end
             else
-                err("failed to load plugin.", err)
+                err("failed to load plugin. " .. e)
             end
         end
     end
@@ -88,9 +88,9 @@ function Manager.process_plugins(from, to, input)
         local ok, resp = pcall(plugin.listen, from, to, input)
 
         if not ok then
-            err("failed to process plugin: " .. plugin.name() .. ". "..resp)
-            local err = resp:gsub("./(.*):(%d*): ", "")
-            return err
+            err(resp)
+            local e = resp:gsub("(.*):(%d*): ", "")
+            return e
         elseif resp ~= nil then
             return resp
         end
