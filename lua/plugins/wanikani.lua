@@ -4,11 +4,11 @@ local json = require("json")
 local Wanikani = {}
 
 function Wanikani.init()
-    print("[lua][wanikani] initializing")
+
 end
 
 function Wanikani.cleanup()
-    print("[lua][wanikani] cleanup")
+
 end
 
 function Wanikani.name()

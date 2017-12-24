@@ -18,7 +18,6 @@ use clap::{Arg, App, ArgMatches};
 use clap::AppSettings::*;
 use errors::*;
 
-use std::default::Default;
 use regex::Regex;
 use irc::client::prelude::*;
 use rlua::Lua;
@@ -40,7 +39,13 @@ fn process_cli<'a>() -> ArgMatches<'a> {
 fn init_logger(logfile: &str, verbosity: u64) -> Result<()> {
     fern::Dispatch::new()
         .format(|out, message, record| {
-            out.finish(format_args!("[{}] {}", record.level(), message))
+            let target = if record.target() == "lua" {
+                "[lua]"
+            } else {
+                ""
+            };
+            out.finish(format_args!("[{}]{} {}", record.level(), target, message))
+
         })
         .level(match verbosity {
             1 => log::LogLevelFilter::Debug,
@@ -74,13 +79,15 @@ fn start_bot() -> Result<()> {
 
     // creates a Lua context
     let lua = Lua::new();
+    util::set_lua_logging_hooks(&lua);
 
     let plugin_host = util::read_file_to_string("lua/plugin_host.lua")?;
     let host = lua.exec::<rlua::Function>(plugin_host.as_str(), Some("PluginHost"))
         .chain_err(|| "failed to initialize PluginHost")?;
     let process = host.call::<(&str), rlua::Function>(("./lua/plugins"))?;
 
-    server.identify()?;
+    server.identify()
+        .chain_err(|| "failed to identify with the IRC server")?;
 
     server.for_each_incoming(|message| {
         let nickname = message.source_nickname();

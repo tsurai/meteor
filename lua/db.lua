@@ -7,5 +7,5 @@ local params = {
     port = 6379,
 }
 
-print('[lua] initializing redis database')
+info('initializing redis database')
 db = redis.connect(params)

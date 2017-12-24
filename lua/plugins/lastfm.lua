@@ -4,11 +4,11 @@ local json = require("json")
 local Lastfm = {}
 
 function Lastfm.init()
-    print("[lua][lastfm] initializing")
+
 end
 
 function Lastfm.cleanup()
-    print("[lua][lastfm] cleanup")
+
 end
 
 function Lastfm.name()

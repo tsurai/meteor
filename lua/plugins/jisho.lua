@@ -4,11 +4,11 @@ local json = require("json")
 local Jisho = {}
 
 function Jisho.init()
-    print("[lua][jisho] initializing")
+
 end
 
 function Jisho.cleanup()
-    print("[lua][jisho] cleanup")
+
 end
 
 function Jisho.name()
