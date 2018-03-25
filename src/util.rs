@@ -3,7 +3,9 @@ use std::io::Read;
 use regex::Regex;
 use rlua::Lua;
 use log::LogLevel;
+use failure::*;
 
+// sets lua up to use the same logging system as rust
 pub fn set_lua_logging_hooks(lua: &Lua) {
     let logs = vec![(LogLevel::Error, "err"),
         (LogLevel::Warn, "warn"),
@@ -24,14 +26,14 @@ pub fn set_lua_logging_hooks(lua: &Lua) {
     }
 }
 
-use errors::*;
-pub fn read_file_to_string(filename: &str) -> Result<String> {
+// helper function to read a file into a string
+pub fn read_file_to_string(filename: &str) -> Result<String, Error> {
     let mut file = File::open(filename)
-        .chain_err(|| format!("failed to open file: '{}'", filename))?;
+        .context(format!("failed to open file: '{}'", filename))?;
 
     let mut contents = String::new();
     file.read_to_string(&mut contents)
-        .chain_err(|| format!("failed to read file: '{}'", filename))?;
+        .context(format!("failed to read file: '{}'", filename))?;
 
     Ok(contents)
 }
@@ -42,11 +44,13 @@ pub fn parse_msg<'a>(re: &Regex, target: &str, msg: &'a str) -> Option<&'a str> 
         "py-ctcp" => {
             None
         },
+        // direct messages
         x if !x.starts_with("#") => {
             Some(msg)
         },
+        // capture all possible ways to address the bot
         _ => {
-            re.captures(msg).map(|x| x.get(1).unwrap().as_str())
+            re.captures(msg).map(|x| x.get(2).unwrap_or_else(|| x.get(1).unwrap()).as_str())
         }
     }
 }

@@ -4,13 +4,13 @@ version = "0.1.0"
 authors = ["Cristian Kubis <cristian.kubis@tsunix.de>"]
 
 [dependencies]
-error-chain = "^0.11.0"
+failure = "^0.1.1"
 log = "^0.3.8"
 chrono = "^0.4.0"
 fern = "^0.4.3"
 clap = "^2.27.1"
 regex = "^0.2.3"
-irc = "^0.12.5"
+irc = "^0.13.4"
 
 [dependencies.rlua]
 version = "^0.10.2"
