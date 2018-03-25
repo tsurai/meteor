@@ -5,7 +5,7 @@ Wanikani community IRC channel bot powered by Rust and Lua
 
 ToDo
 ----
+- [x] better lua error handling
 - [ ] user permission system
-- [ ] better lua error handling
 - [ ] various plugins
 - [ ] proper install script to setup all paths and permissions
