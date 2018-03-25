@@ -1,4 +1,4 @@
-local http = require("socket.http")
+local http = require("ssl.https")
 local json = require("json")
 
 local Jisho = {}
@@ -19,6 +19,10 @@ function Jisho.description()
     return "no description"
 end
 
+function Jisho.help()
+    return "N/A"
+end
+
 local function url_encode(str)
   if (str) then
     str = string.gsub (str, "\n", "\r\n")
@@ -30,7 +34,7 @@ local function url_encode(str)
 end
 
 local function api_call(payload)
-    local url = "http://jisho.org/api/v1/search/words?keyword="..url_encode(payload)
+    local url = "https://jisho.org/api/v1/search/words?keyword="..url_encode(payload)
     local body, code, _, _ = http.request(url)
     assert(code == 200, "An API error has occured. Got status code: "..code)
 
@@ -43,7 +47,11 @@ end
 function Jisho.listen(from, to, input)
     input = input:lower()
 
-    local word = string.match(input, "lookup (.*)")
+    local word = string.match(input, "!jisho (.*)")
+    if word == nil then
+        word = string.match(input, "lookup (.*)")
+    end
+
     if word ~= nil then
         local _, data = assert(pcall(api_call, word))
         assert(#data.data ~= 0, "No results found")

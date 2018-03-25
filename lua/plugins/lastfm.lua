@@ -19,6 +19,10 @@ function Lastfm.description()
     return "no description"
 end
 
+function Lastfm.help()
+    return "N/A"
+end
+
 local function api_call(from, endpoint, payload)
     local key = db:get('lastfm.apikey')
     assert(key ~= nil, "I currently have no last.fm API key set")
@@ -39,7 +43,7 @@ end
 function Lastfm.listen(from, to, input)
     input = input:lower()
 
-    if string.match(input, "show now playing") ~= nil then
+    if string.match(input, "lastfm") ~= nil or string.match(input, "show now playing") ~= nil then
         local _, data = assert(pcall(api_call, from, "user.getrecenttracks", "&limit=1"))
 
         data = data.recenttracks

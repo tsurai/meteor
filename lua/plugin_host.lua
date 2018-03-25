@@ -9,7 +9,7 @@ local Manager = {
 
 local function is_valid_plugin(plugin)
     ret = true
-    function_names = {"init", "cleanup", "name", "description", "listen"}
+    function_names = {"init", "cleanup", "name", "description", "help", "listen"}
 
     for i, fn in ipairs(function_names) do
         if type(plugin[fn]) ~= "function" then

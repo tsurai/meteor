@@ -1,4 +1,4 @@
-local http = require("socket.http")
+local https = require("ssl.https")
 local json = require("json")
 
 local Weather = {}
@@ -19,6 +19,10 @@ function Weather.description()
     return "no description"
 end
 
+function Weather.help()
+    return "N/A"
+end
+
 local function url_encode(str)
   if (str) then
     str = string.gsub (str, "\n", "\r\n")
@@ -31,7 +35,7 @@ end
 
 local function api_call(payload)
     local url = "https://query.yahooapis.com/v1/public/yql?format=json&q="..url_encode(payload)
-    local body, code, _, _ = http.request(url)
+    local body, code, _, _ = https.request(url)
     assert(code == 200, "An API error has occured. Got status code: "..code)
 
     local json_data = json.decode(body)
@@ -43,7 +47,7 @@ end
 function Weather.listen(from, to, input)
     input = input:lower()
 
-    if string.match(input, "show my weather") ~= nil then
+    if string.match(input, "!we") or string.match(input, "show my weather") ~= nil then
         local location = db:get('weather.user.'..from)
         assert(location ~= nil, from..": you have to tell me your location first")
 

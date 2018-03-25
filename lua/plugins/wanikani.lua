@@ -16,14 +16,19 @@ function Wanikani.name()
 end
 
 function Wanikani.description()
-    return "no description"
+    return "This plugin offers various Wanikani related functionalities using their API. After adding your API key it's possible to query your study queue and show general stats"
+end
+
+function Wanikani.help()
+    return "N/A"
 end
 
 local function api_call(from, endpoint)
     local key = db:get('wk.'..from)
     assert(key ~= nil, from..": you have to tell me your api key first")
 
-    local body, code, _, _ = https.request("https://www.wanikani.com/api/user/"..key.."/"..endpoint)
+    local url = "https://www.wanikani.com/api/user/"..key.."/"..endpoint
+    local body, code, _, _ = https.request(url)
     assert(code == 200, "An API error has occured. Got status code: "..code)
 
     local json_data = json.decode(body)
@@ -35,7 +40,7 @@ end
 function Wanikani.listen(from, to, input)
     input = input:lower()
 
-    if string.match(input, "show my review count") ~= nil then
+    if input == "!wk" or input == "show my review count" then
         local _, data = assert(pcall(api_call, from, "study-queue"))
 
         time = "now"
@@ -52,7 +57,7 @@ function Wanikani.listen(from, to, input)
             data.reviews_available_next_day)
 
         return ret
-    elseif string.match(input, "show my wanikani stats") ~= nil then
+    elseif input == "!is" or input == "show my wanikani stats" then
         local _, data = assert(pcall(api_call, from, "srs-distribution"))
 
         local str = "Apprentice: %d - Guru: %d - Master: %d - Enlightend: %d - Burned: %d"
@@ -64,7 +69,7 @@ function Wanikani.listen(from, to, input)
 
         return ret
     else
-        key = string.match(input, "set my wanikani api key to (%w*)")
+        local key = string.match(input, "set my wanikani api key to (%w*)")
         if key ~= nil then
             db:set('wk.'..from, key)
             return from..": your wanikani API key has been saved"
