@@ -29,11 +29,17 @@ fn process_cli<'a>() -> ArgMatches<'a> {
              .long("verbose")
              .multiple(true)
              .help("increrases the logging verbosity each use for up to 2 times"))
+        .arg(Arg::with_name("config")
+             .short("c")
+             .long("config")
+             .value_name("FILE")
+             .takes_value(true)
+             .help("absolute path to the config file. Default path is /var/lib/meteor/config.toml"))
         .get_matches()
 }
 
 // initiates the logging system for both rust and lua
-fn init_logger(logfile: &str, verbosity: u64) -> Result<(), Error> {
+fn init_logger(logfile: String, verbosity: u64) -> Result<(), Error> {
     fern::Dispatch::new()
         // prefix logging messages from lua
         .format(|out, message, record| {
@@ -69,9 +75,9 @@ fn init_logger(logfile: &str, verbosity: u64) -> Result<(), Error> {
         .map_err(|e| e.into())
 }
 
-fn start_bot() -> Result<(), Error> {
+fn start_bot(config: Config) -> Result<(), Error> {
     // create a new IrcClient instance from config file
-    let client = IrcClient::new("~/.local/meteor/config.toml")
+    let client = IrcClient::from_config(config)
         .context("failed to create IRC server object")?;
 
     // get the current bot nickname
@@ -144,12 +150,28 @@ fn start_bot() -> Result<(), Error> {
 fn run() -> Result<(), Error> {
     let matches = process_cli();
     let verbosity = matches.occurrences_of("verbose");
+    let config_path = matches.value_of("config")
+        .unwrap_or("/usr/lib/meteor/config.toml");
 
-    init_logger("~/.local/meteor/meteor.log", verbosity)
+    let config = Config::load(config_path)
+        .context("failed to load config file")?;
+
+    // read the logfile path from config or use default
+    let logfile_path = match config.options {
+        Some(ref options) => {
+            options.get("logfile_path").map(|x| x.clone())
+        },
+        None => {
+            None
+        }
+    }
+    .unwrap_or("/var/log/meteor/meteor.log".to_string());
+
+    init_logger(logfile_path, verbosity)
         .context("failed to setup logging system")?;
 
     // start the bot and loop over incoming messages
-    start_bot()
+    start_bot(config)
 }
 
 fn main() {
