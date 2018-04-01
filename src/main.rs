@@ -155,11 +155,23 @@ fn run() -> Result<(), Error> {
 fn main() {
     // failure crate boilerplate
     if let Err(e) = run() {
+        use std::io::Write;
+        let mut stderr = std::io::stderr();
+        let got_logger = log_enabled!(log::LogLevel::Error);
+
         let mut fail: &Fail = e.cause();
-        error!("{}", fail);
+        if got_logger {
+            error!("{}", fail);
+        } else {
+            writeln!(&mut stderr, "{}", fail).ok();
+        }
 
         while let Some(cause) = fail.cause() {
-            error!("caused by: {}", cause);
+            if got_logger {
+                error!("caused by: {}", cause);
+            } else {
+                writeln!(&mut stderr, "caused by: {}", cause).ok();
+            }
 
             if let Some(bt) = cause.backtrace() {
                 error!("backtrace: {}", bt)
@@ -167,6 +179,7 @@ fn main() {
             fail = cause;
         }
 
+        stderr.flush().ok();
         ::std::process::exit(1);
     }
 }
